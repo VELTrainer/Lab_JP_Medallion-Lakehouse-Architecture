@@ -1,228 +1,160 @@
 ---
-title: Medallion Lakehouse アーキテクチャ入門🥉🥈🥇
+title: Introduction to the Medallion Lakehouse Architecture 🥉🥈🥇
 permalink: index.html
 layout: home
 ---
-# 🏅Medallion アーキテクチャについて🏠
+# 🏅 About the Medallion Architecture 🏠
 
-メダリオン レイクハウス アーキテクチャ (一般に["メダリオン アーキテクチャ"](https://learn.microsoft.com/ja-jp/azure/databricks/lakehouse/medallion) と呼ばれます) は、組織がレイクハウス内のデータを論理的に整理するために使用する設計パターンです。 これは Fabric に推奨される設計アプローチです。
+The Medallion Lakehouse Architecture (commonly referred to as the "Medallion Architecture") is a layered approach to organizing data in a lakehouse. See the Microsoft documentation here: ["Medallion architecture"](https://learn.microsoft.com/ja-jp/azure/databricks/lakehouse/medallion).
 
-[メダリオン アーキテクチャは、3 つの異なるレイヤー (ゾーン) で構成されています。 各レイヤーは、レイクハウスに保存されているデータの品質を示し、高いレベルは高い品質を表します。 この多層アプローチは、エンタープライズ データ製品にとっての信頼できる唯一のソースを構築するのに役立ちます。
+[The Medallion Architecture consists of three distinct layers (zones). Each layer represents a different level of data quality stored in the lakehouse...]
+  
+An important point is that the Medallion Architecture ensures atomicity, consistency, isolation, and durability (ACID) as data moves through the layers. Raw data...
 
-重要なことは、メダリオンアーキテクチャは、データがレイヤーを通過する際に、原子性、一貫性、分離、耐久性（ACID）を保証することです。 生データから始まり、一連の検証と変換により、効率的な分析用に最適化されたデータが作られます。 メダリオン ステージには、ブロンズ (生)、シルバー (検証済み)、ゴールド (強化) の 3 つのステージがあります。
+The goal of this exercise is to build the Fabric architecture hands-on and share it within your group.
+Because diagrams are created by people with different styles and preferences, visual variations in the diagrams are natural.
+What matters most is that you deepen your own understanding of Fabric.
 
-今回の演習の目標は Fabric のアーキテクチャをハンズオンでビルドして、グループで共有する事です。
-人の作り方や好みによって、自然に図の見た目のバリエーションがあります。
-最も大切なのは、**自分のFabricの理解を深める事です。**
+# ☁️ About Azure Diagrams ☁️
 
-# ☁️Azure Diagrams について☁️
-この演習では、無料ツールのAzure Diagramsを使用し、Fabricのアーキテクチャを説明する図を作成します。
+In this exercise we will use the free tool Azure Diagrams to create diagrams that explain the Fabric architecture.
 
-Azure Diagramsは、Microsoft の公式なツールではありません。Microsoft の社員がアーキテクチャを説明するために作った便利なリソースです。
-費用は一切かかりませんが、会社のセキュリティーおよびコンプライアンスのポリシーに従ってアカウントを作るか判断してください。
-今日の演習では、アカウント無しでも実施ができますので、アカウント作成は受講者の自由となります。
+Azure Diagrams is not an official Microsoft product. It is a helpful community resource created by Microsoft employees to illustrate architectures.
+There is no cost to use it, but please follow your organization's security and compliance policies when deciding whether to create an account.
+For today's exercise you can complete all tasks without an account, so creating one is optional.
 
-Fabricだけではなく、他にもアーキテクチャの図は作成可能：
-- Azure
-- Power Platform・Dynamics 365
-- マイクロソフト以外のベンダー（GCP、AWS等）
+## Accessing and preparing Azure Diagrams
 
-## Azure Diagramsへのアクセスと準備
-
-先ずは以下のリンクをブラウザの別タブでアクセスしてください。
-**Blank Canvas** を押します。
+First, open the following link in a separate browser tab.
+Click "Blank Canvas".
 
 <!-- This link format lets us open in a seperate tab 😇 -->
 <a href="https://azurediagrams.com/" target="_blank">https://azurediagrams.com</a>
 
+<img src="images/AZD1.png" alt="Azure Diagrams main screen" style="width:950px; height:500px;">
 
+## Tool guide and explanation
 
-<img src="images/AZD1.png" alt="Azure Diagramsメイン画面" style="width:950px; height:500px;">
+How to use 1️⃣: Top-right controls
 
-
-## ツールの案内と説明
-
-使い方1️⃣：右上の機能
-
-1. **New Diagram**: 新しい画面を作る操作。編集中のDiagramを保存しないで New Diagram押すと、途中までの図が削除される
-    
-1. **Clone Diagram**: 表情の図を新しいリンクで複製する
-    
-1. **Export**:　図を画像としてエクスポートする
-
-1. **Settings**: プロフィールや図についてさまざまな設定。
-    
-1. **Save Changes**: 変更は自動保存じゃないため、閉じる前に押すこと
-    
-1. **プロフィール**: （任意）アカウントのログイン、プロフィール編集、パスワード変更
-    
+1. New Diagram: Create a new canvas. If you press New Diagram without saving the diagram in progress, the unsaved work will be lost.
+2. Clone Diagram: Duplicate the current diagram to a new link.
+3. Export: Export the diagram as an image.
+4. Settings: Various settings for your profile and diagram.
+5. Save Changes: Changes are not auto-saved, so press this before closing.
+6. Profile: (Optional) Sign in to an account, edit your profile, or change your password.
 
 <img src="images/AZD2.png" alt="Azure Diagrams Tutorial" style="width:950px; height:500px;">
 
+How to use 2️⃣: Left-side palette
 
-使い方2️⃣：左側の図パーツ
-
-1. **Search**: よく利用されるサービスを検索して図に追加する。全てのリソースでもない
-    
-1. **Annotation**: 長文のテキストを書くためのラベル
-    
-1. **Label**:　短文のテキストを書くためのラベル
-
-1. **Custom Resource**: 製品やプロセスのカスタムでできるタイル。アイコン、タイトル、サブタイトルが含まれる
-    
-1. **Section**: 複数のリソースをまとめて表情するためのボックス
-    
-1. **Shape**: 図形の作成
+1. Search: Search common services and add them to the diagram. Not all resources are shown.
+2. Annotation: Add a large text label for longer explanations.
+3. Label: Add a short text label.
+4. Custom Resource: Create a custom tile for products or processes. It includes an icon, title, and subtitle.
+5. Section: Group multiple resources inside a box.
+6. Shape: Create shapes for the diagram.
 
 <img src="images/AZD3.png" alt="Azure Diagrams Tutorial" style="width:950px; height:500px;">
 
-使い方3️⃣：カスタム リソース
+How to use 3️⃣: Custom Resource
 
-1. **Custom Resource**: ドラッグアンドドロップで図に追加
-    
-1. **接続・データ フロー**: Custom Resourceの間に線を引くと、データの流れを表示する。リソースの種類によって、自動的線も変わる場合がある
-    
-1. **カスタマイズ**:　アイコンを押すと、Resource タイルの表示設定を調整
-
-1. **アイコン**: Searchで表示されないアイコンがたくさんある。より細かいアーキテクチャ図を作るならオススメ
-
+1. Custom Resource: Drag and drop to add a custom resource to the canvas.
+2. Connections / Data Flow: Draw lines between Custom Resources to show data flow. Depending on resource types, connector styles may change automatically.
+3. Customization: Click the icon to adjust how the Resource tile is displayed.
+4. Icons: There are many icons that do not appear in Search. Use them if you want more detailed architecture diagrams.
 
 <img src="images/AZD4.png" alt="Azure Diagrams Tutorial" style="width:950px; height:500px;">
 
-使い方4️⃣：カスタム シェイプ
+How to use 4️⃣: Custom Shapes
 
-1. **Shapes**: ドラッグアンドドロップで図に追加
-    
-1. **Shape**: 図形の形を設定する
-    
-1. **Background Color**:　透明度をマックスに上げると、枠だけの図形になる
-
-1. **Border Color**: 図の枠の色の設定
-
-
+1. Shapes: Drag and drop shapes onto the canvas.
+2. Shape: Choose the shape type.
+3. Background Color: Increase transparency to make the shape outline-only.
+4. Border Color: Set the border color for the shape.
 
 <img src="images/AZD5.png" alt="Azure Diagrams Tutorial" style="width:950px; height:500px;">
 
+### Optional: Account registration
 
+This exercise can be completed without registering an account.
+However, if you choose to create an account, the benefits include:
+- Save diagrams and edit them later
+- Share diagrams with others or the community
+- Share private diagrams with specific users and set access roles
 
-### **任意**: アカウントの登録
+How to sign up
 
+1️⃣ Click "Sign In" at the top-right and then click "Sign in or Create Account"
 
-今回の演習は、アカウントを登録せずに全てのタスクは完了可能です。
-しかし、アカウントを持っている場合は以下のメリットあります：
-- 作った Diagram を保存し、後で編集する
-- Diagramを他のユーザーまたはコミュニティーに共有ができる
-- 他のユーザーにプライベート（非公開）Diagram 共有とアクセス権限の設定（役割型）
+<img src="images/AZD8.png" alt="Azure Diagrams screen" style="width:950px; height:500px;">
 
+2️⃣ Click "Don't have an account? Sign up now"
 
-<u><b>サインアップする方法</b></u>
+3️⃣ Enter your email address on the next screen. After confirming your email, set a password and your display name.
 
-1️⃣
+<img src="images/AZD8-5.png" alt="Azure Diagrams sign up" style="width:950px; height:500px;">
 
-右上の**Sign In**を押して、**Sign in or Create Accountを押します**
+# ✅ Review sample Fabric architecture diagrams ✅
 
-<img src="images/AZD8.png" alt="Azure Diagrams画面" style="width:950px; height:500px;">
+**1️⃣** Click "Examples" at the bottom-left.
 
-2️⃣
+<img src="images/AZD10.png" alt="Azure Diagrams screen" style="width:950px; height:500px;">
 
-**Don't have an account? Sign up now**を押します
+**2️⃣** The Examples window opens. Drag the window by its top (1) to resize it.
+Find and click the Fabric sample diagram "Lakehouse Architecture on Fabric" (2).
 
-3️⃣
+<img src="images/AZD11.png" alt="Azure Diagrams screen" style="width:950px; height:500px;">
 
-以下の画面に、メールアドレスを入力して、メールアドレス確認が終わってからパスワードと名前を設定します。
+**3️⃣** Hover over the connection between "Fabric Data Factory" and "Fabric Lakehouse" and confirm that the integration detail shows "Batch & Scheduled."
 
-<img src="images/AZD8-5.png" alt="Azure Diagrams画面" style="width:950px; height:500px;">
+<img src="images/AZD12.png" alt="Azure Diagrams screen" style="width:950px; height:500px;">
 
+**4️⃣** There are community-provided examples as well. Click "Community Diagrams", then use the browser find (Ctrl+F) to search "Fabric" and choose any sample you like.
 
+<img src="images/AZD13.png" alt="Azure Diagrams screen" style="width:950px; height:500px;">
 
-# ✅Fabricのサンプル アーキテクチャ図を確認する✅
+# 🏠 Create your Fabric architecture diagram 🌊
 
+## Exercise
 
-**1️⃣**
+1. Use Azure Diagrams to create diagrams representing what you completed in labs 01–04.
+2. (Optional) Clone the diagram from step 1 and reflect the content of labs 05–07.
+3. Extend the lab 01–04 diagram to represent the Medallion architecture.
 
-左下にある **Examples** を押します
+### Example answers
 
+1. [Example for labs 01–04](./images/diagram-01-04.png) : [Azure Diagrams](https://azurediagrams.com/D54ivtsh)  
+2. [Example for labs 05–07](./images/diagram-05-07.png) : [Azure Diagrams](https://azurediagrams.com/e4F4s7l8)  
+3. [Example Medallion architecture diagram](./images/diagram-medallion.png) : [Azure Diagrams](https://azurediagrams.com/NhmRmML4)
 
-<img src="images/AZD10.png" alt="Azure Diagrams画面" style="width:950px; height:500px;">
+# 📂 Exporting and sharing diagrams 🔗
 
-**2️⃣**
+How to share a diagram — two methods
 
+Method 1️⃣: Save as an image
 
-Examplesのウィンドウが開かれます。ウィンドウの上をマウスで掴んで(1)、サイズを調整します。
-Fabricのサンプル図 **Lakehouse Architecture on Fabric**を探して、クリックします。(2)
+You can export PNG or SVG. Click the image icon at the top-right and choose the file type.
 
+SVG preserves interactive elements (like scrollable areas).
 
-<img src="images/AZD11.png" alt="Azure Diagrams画面" style="width:950px; height:500px;">
+<img src="images/AZD20.png" alt="Azure Diagrams export" style="width:950px; height:500px;">
 
-**3️⃣**
+Method 2️⃣: Share access to the diagram
 
-**Fabric Data Factory**と**Fabric Lakehouse**の間にある接続をマウスでかざして、統合の詳細が **Batch & Scheduled**となっている事を確認します。
+There are three sharing types:
+1. Community: The diagram is searchable and viewable by anyone and appears in Community Diagrams.
+2. Link: The diagram is hidden from search but accessible to anyone with the unique link.
+3. Private: Access is limited to the people you share it with.
 
+To share, save the diagram and click the settings gear ⚙.
 
-<img src="images/AZD12.png" alt="Azure Diagrams画面" style="width:950px; height:500px;">
+From settings, choose "Sharing" 👥.
 
-**4️⃣**
+<img src="images/AZD21.png" alt="Azure Diagrams sharing" style="width:950px; height:500px;">
 
+## Resources
 
-コミュニティーが提供している例もあります。**Community Diagrams**を押し、ブラウザのページ上検索（Ctrl+F)に「Fabric」を入力して、好きなサンプルを選びます。
-
-
-<img src="images/AZD13.png" alt="Azure Diagrams画面" style="width:950px; height:500px;">
-
-
-
-
-# 🏠Fabricのアーキテクチャ図を作成する🌊
-
-
-## 演習
-
-1. lab 01-04 で実施した内容を Azure Diagrams を使用して作図しましょう
-
-1. （option）1. の図をクローンし、lab 05-07 の内容を反映してみましょう
-
-1. lab 01-04 の作図をメダリオンアーキテクチャとして拡張しましょう
-
-
-### 回答例
-
-1. [lab 01-04 の回答例へのリンク](./images/diagram-01-04.png) : [Azure Diagrams](https://azurediagrams.com/D54ivtsh)
-2. [lab 05-07 の回答例へのリンク](./images/diagram-05-07.png) : [Azure Diagrams](https://azurediagrams.com/e4F4s7l8)
-3. [メダリオンアーキテクチャの回答例へのリンク](./images/diagram-medallion.png) : [Azure Diagrams](https://azurediagrams.com/NhmRmML4)
-
-
-
-# 📂図のエクスポートと共有🔗
-
-<u><b>図の共有方法は２つあります</b></u>
-
-方法1️⃣：画像として保存
-
-PNGとSVGは使えます。右上の画像アイコンを押して、ファイルタイプを選択します。
-
-SVGを選ぶと、ライブインタラクション（スクロール等）ができます
-
-<img src="images/AZD20.png" alt="Azure Diagrams画面" style="width:950px; height:500px;">
-
-方法2️⃣：図へのアクセスを共有
-
-３つの共有タイプがあります。
-1. **Community**:図は検索可能で、誰でも閲覧でき、**Community Diagrams** に表示されます。
-    
-1. **Link**:図は検索から隠されていますが、ユニークなリンクを持っている人なら誰でもアクセスできます。
-
-1. **Private**:図は共有した人だけがアクセスできます。
-
-共有するために、Diagram を保存して、設定の歯車 ⚙ を押します。
-
-設定のオプションから、Sharing 👥 を押します。
-
-<img src="images/AZD21.png" alt="Azure Diagrams画面" style="width:950px; height:500px;">
-
-
-
-## リソース
-
-- [Microsoft Fabric でメダリオン Lakehouse アーキテクチャを実装](https://learn.microsoft.com/ja-jp/fabric/onelake/onelake-medallion-lakehouse-architecture)
-- [Microsoft Fabric のグリーンフィールド レイクハウス](https://learn.microsoft.com/ja-jp/azure/architecture/example-scenario/data/greenfield-lakehouse-fabric)
-- [Microsoft Fabric 開発ガイド](https://speakerdeck.com/ryomaru0825/microsoft-fabric-kai-fa-gaido?slide=31)
+- [Implement a Medallion Lakehouse architecture with Microsoft Fabric](https://learn.microsoft.com/ja-jp/fabric/onelake/onelake-medallion-lakehouse-architecture)
+- [Greenfield Lakehouse on Microsoft Fabric](https://learn.microsoft.com/ja-jp/azure/architecture/example-scenario/data/greenfield-lakehouse-fabric)
+- [Microsoft Fabric Developer Guide (slides)](https://speakerdeck.com/ryomaru0825/microsoft-fabric-kai-fa-gaido?slide=31)
